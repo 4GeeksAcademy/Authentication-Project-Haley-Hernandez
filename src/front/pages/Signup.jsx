@@ -4,12 +4,12 @@ import useGlobalReducer from "../hooks/useGlobalReducer.jsx";
 import "../index.css";
 import { use } from "react";
 
-const Signup = () => {
+export const Signup = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const navigate = useNavigate();
-    const [store, dispatch] = useGlobalReducer // this i need help figuring out 
-
+    const {store, dispatch} = useGlobalReducer()
+    const apiUrl = import.meta.env.VITE_BACKEND_URL;
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -19,7 +19,7 @@ const Signup = () => {
         };
 
         try {
-            const response = await fetch("", {
+            const response = await fetch(apiUrl+"/signup", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
@@ -29,10 +29,10 @@ const Signup = () => {
 
             if (response.ok) {
                 navigate("/login");
-            } else {
-                const data = await response.json();
-                console.log("Signup failed:", data);
-            }
+            const data = await response.json(); // optional: get the JSON response
+            console.log("User created:", data);
+            return data;
+            } 
         } catch (error) {
             console.error("Error during signup:", error);
         }
@@ -40,6 +40,7 @@ const Signup = () => {
 
     return (
         <form onSubmit={handleSubmit}>
+
             <input
                 type="email"
                 value={email}

@@ -3,12 +3,14 @@ import { useNavigate } from "react-router-dom";
 import useGlobalReducer from "../hooks/useGlobalReducer.jsx";
 import "../index.css"
 
+
+
 const Login = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const navigate = useNavigate();
-    const [store, dispatch] = useGlobalReducer // this i need help figuring out 
-
+    const { store, dispatch } = useGlobalReducer()
+    const apiUrl = import.meta.env.VITE_BACKEND_URL;
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -18,7 +20,7 @@ const Login = () => {
         };
 
         try {
-            const response = await fetch("", {
+            const response = await fetch(apiUrl + "/token", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
@@ -26,12 +28,11 @@ const Login = () => {
                 body: JSON.stringify(payload)
             });
 
-            if (response.ok) {
-                navigate("/login");
-            } else {
-                const data = await response.json();
-                console.log("Login failed:", data);
-            }
+            const data = await response.json(); 
+            console.log("Logged in successful:", data);
+            sessionStorage.setItem("jwt-token", data.token);
+            navigate("/private")
+            return data;
         } catch (error) {
             console.error("Error during Login:", error);
         }
