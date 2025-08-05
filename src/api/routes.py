@@ -34,6 +34,19 @@ def user_signup():
 
     return jsonify("User created successfully"), 200
 
+@api.route("/token", methods=["POST"])
+def create_token():
+    body = request.json
+    # Query your database for username and password
+    user = User.query.filter_by(email= body["email"], password=body ["password"]).first()
+
+    if user is None:
+        # The user was not found on the database
+        return jsonify({"msg": "Bad username or password"}), 401
+    
+    # Create a new token with the user id inside
+    access_token = create_access_token(identity=str(user.id))
+    return jsonify({ "token": access_token, "user_id": user.id })
 
 @api.route("/protected", methods=['GET'])
 @jwt_required()
